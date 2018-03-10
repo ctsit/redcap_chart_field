@@ -1,6 +1,6 @@
 {
-    "name": "REDCap Charts",
-    "namespace": "REDCapCharts\\ExternalModule",
+    "name": "REDCap Chart Field",
+    "namespace": "REDCapChartField\\ExternalModule",
     "description": "TODO.",
     "permissions": [
         "redcap_every_page_before_render",

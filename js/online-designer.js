@@ -19,7 +19,7 @@ $(document).ready(function() {
 
     // Adding extra config fields.
     var $label = $('#quesTextDiv > table > tbody > tr > td').first().children('div').first();
-    $label.after(redcapCharts.onlineDesignerContents);
+    $label.after(redcapChartField.onlineDesignerContents);
 
     // Adding chart option.
     var $fieldSelector = $('select[name="field_type"]');
@@ -45,11 +45,11 @@ $(document).ready(function() {
         $('[name="field_annotation"]').val('');
 
         // Setting up default values.
-        if (typeof redcapCharts.fields[fieldName] !== 'undefined') {
-            $.each(redcapCharts.fields[fieldName], function(key, value) {
+        if (typeof redcapChartField.fields[fieldName] !== 'undefined') {
+            $.each(redcapChartField.fields[fieldName], function(key, value) {
                 $target = $('[name="' + key + '"');
 
-                switch (redcapCharts.configFields[key]) {
+                switch (redcapChartField.configFields[key]) {
                     case 'json':
                         $target.val(JSON.stringify(value, null, 4));
                         break;

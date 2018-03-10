@@ -1,17 +1,17 @@
 <?php
 /**
  * @file
- * Provides ExternalModule class for REDCap Charts module.
+ * Provides ExternalModule class for REDCap Chart Field module.
  */
 
-namespace REDCapCharts\ExternalModule;
+namespace REDCapChartField\ExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 use RCView;
 
 /**
- * ExternalModule class for REDCap Charts module.
+ * ExternalModule class for REDCap Chart Field module.
  */
 class ExternalModule extends AbstractExternalModule {
 
@@ -120,7 +120,7 @@ class ExternalModule extends AbstractExternalModule {
      * Sets JS settings.
      */
     protected function setJsSettings() {
-        echo '<script>redcapCharts = ' . json_encode($this->settings) . ';</script>';
+        echo '<script>redcapChartField = ' . json_encode($this->settings) . ';</script>';
     }
 
     /**
