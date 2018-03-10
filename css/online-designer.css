@@ -1,0 +1,9 @@
+.chart-property {
+    display: none;
+    margin-top: 10px;
+}
+
+.chart-property textarea {
+    height: 100px;
+    width: 330px;
+}

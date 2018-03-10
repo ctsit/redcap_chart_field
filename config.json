@@ -1,0 +1,34 @@
+{
+    "name": "REDCap Charts",
+    "namespace": "REDCapCharts\\ExternalModule",
+    "description": "TODO.",
+    "permissions": [
+        "redcap_every_page_before_render",
+        "redcap_every_page_top"
+    ],
+    "authors": [
+        {
+            "name": "Philip Chase",
+            "email": "pbc@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Taryn Stoffs",
+            "email": "tls@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Marly Cormar",
+            "email": "marlycormar@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Tiago Bember",
+            "email": "tbembersimeao@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        }
+    ],
+    "compatibility": {
+        "redcap-version-min": "8.0.3"
+    }
+}
