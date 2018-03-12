@@ -8,7 +8,6 @@ $(document).ready(function() {
             $('#div_field_annotation').hide();
         }
         else {
-            $misc.val(miscContents);
             $('.chart-property').hide();
 
             if (fieldType !== 'section_header') {
@@ -41,7 +40,6 @@ $(document).ready(function() {
             return;
         }
 
-        fieldsVisited[fieldName] = true;
         $('[name="field_annotation"]').val('');
 
         // Setting up default values.
@@ -49,9 +47,9 @@ $(document).ready(function() {
             $.each(redcapChartField.fields[fieldName], function(key, value) {
                 $target = $('[name="' + key + '"');
 
-                switch (redcapChartField.configFields[key]) {
+                switch (redcapChartField.configFields[key].type) {
                     case 'json':
-                        $target.val(JSON.stringify(value, null, 4));
+                        $target.val(value);
                         break;
                     case 'select':
                         $target.children('option[value="' + value +'"]').prop('selected', true);
@@ -59,18 +57,31 @@ $(document).ready(function() {
                 }
             });
         }
+
+        $('.ui-button-text').each(function() {
+            if ($(this).text() !== 'Save') {
+                return;
+            }
+
+            // TODO: add validation.
+
+            $(this).parent().click(function() {
+                if ($fieldSelector.val() === 'chart') {
+                    fieldsVisited[fieldName] = true;
+                }
+            });
+
+            return false;
+        });
     });
 
     // Validating JSON fields.
     $('.json-field').change(function() {
         try {
-            var ob = JSON.parse($(this).val());
-            var value = JSON.stringify(ob, null, 4);
+            redcapChartField.looseJsonParse($(this).val());
         }
         catch (err) {
-            var value = '';
+            $(this).val('');
         }
-
-        $(this).val(value);
     });
 });
