@@ -4,4 +4,4 @@ $(document).ready(function() {
         $('#' + fieldName + '-tr').append('<td colspan="2"><div id="' + fieldName + '-chart"></div></td>');
         Chartist[settings.chart_type]('#' + fieldName + '-chart', params.data, params.options, params.responsive_options);
     });
-})
+});

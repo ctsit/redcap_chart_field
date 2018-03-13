@@ -27,7 +27,42 @@ $(document).ready(function() {
     // Showing or hiding chart fields based on field type selection.
     $fieldSelector.change(chartFieldsBranchingLogic);
     $('#div_add_field').on('dialogopen', function() {
+        // Branching logic on chart fields.
         chartFieldsBranchingLogic();
+
+        // Adding validation on submit.
+        var buttons = $(this).dialog('option', 'buttons');
+        $.each(buttons, function(i, button) {
+            if (button.text !== 'Save') {
+                return;
+            }
+
+            var callback = button.click;
+            buttons[i].click = function() {
+                if ($fieldSelector.val() !== 'chart') {
+                    callback();
+                }
+
+                var success = true;
+                $('.chart-property-input').each(function() {
+                    if (!redcapChartField.validateChartPropertyInput(this)) {
+                        success = false;
+                        return false;
+                    }
+                });
+
+                if (!success) {
+                    return false;
+                }
+
+                fieldsVisited[fieldName] = true;
+                callback();
+            }
+
+            return false;
+        });
+
+        $(this).dialog('option', 'buttons', buttons);
 
         // Skip if this is not a chart field.
         if ($fieldSelector.val() !== 'chart') {
@@ -48,7 +83,9 @@ $(document).ready(function() {
                 $target = $('[name="' + key + '"');
 
                 switch (redcapChartField.configFields[key].type) {
+                    case 'int':
                     case 'json':
+                    case 'array':
                         $target.val(value);
                         break;
                     case 'select':
@@ -56,32 +93,6 @@ $(document).ready(function() {
                         break;
                 }
             });
-        }
-
-        $('.ui-button-text').each(function() {
-            if ($(this).text() !== 'Save') {
-                return;
-            }
-
-            // TODO: add validation.
-
-            $(this).parent().click(function() {
-                if ($fieldSelector.val() === 'chart') {
-                    fieldsVisited[fieldName] = true;
-                }
-            });
-
-            return false;
-        });
-    });
-
-    // Validating JSON fields.
-    $('.json-field').change(function() {
-        try {
-            redcapChartField.looseJsonParse($(this).val());
-        }
-        catch (err) {
-            $(this).val('');
         }
     });
 });

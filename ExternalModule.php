@@ -1,18 +1,21 @@
 <?php
 /**
  * @file
- * Provides ExternalModule class for REDCap Charts module.
+ * Provides ExternalModule class for REDCap Chart Field module.
  */
 
-namespace REDCapCharts\ExternalModule;
+namespace REDCapChartField\ExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 use Piping;
 use RCView;
 
+define('CHARTJS_VERSION', '2.7.2');
+define('CHARTIST_VERSION', '0.11.0');
+
 /**
- * ExternalModule class for REDCap Charts module.
+ * ExternalModule class for REDCap Chart Field module.
  */
 class ExternalModule extends AbstractExternalModule {
 
@@ -30,7 +33,7 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
-        $this->jsSettings['configFields'] = $this->getConfigFields($project_id);
+        $this->jsSettings['configFields'] = $this->getConfigFieldsInfo($project_id);
 
         if (PAGE === 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'chart') {
             $misc = array();
@@ -59,7 +62,7 @@ class ExternalModule extends AbstractExternalModule {
      */
     function redcap_every_page_top($project_id) {
         if (PAGE == 'Design/online_designer.php') {
-            $this->buildChartConfigFields();
+            $this->buildConfigFormFields();
         }
     }
 
@@ -93,7 +96,7 @@ class ExternalModule extends AbstractExternalModule {
             }
 
             foreach ($this->jsSettings['configFields'] as $key => $info) {
-                if ($info['type'] == 'json') {
+                if ($info['type'] == 'json' || $info['type'] == 'array') {
                     $config[$key] = $this->__piping($config[$key], $record, $event_id, $instance);
                 }
             }
@@ -113,36 +116,47 @@ class ExternalModule extends AbstractExternalModule {
      * Load charts library on the current page.
      */
     function loadChartsLib() {
-        switch ($this->getProjectSetting('chart_lib', $project_id)) {
+        $lib = $this->getProjectSetting('chart_lib', $project_id);
+
+        switch ($lib) {
             case 'chartjs':
-                $this->includeJs('//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js');
-                $this->jsFiles[] = 'js/chartjs.js';
+                $this->includeJs('//cdnjs.cloudflare.com/ajax/libs/Chart.js/' . CHARTJS_VERSION . '/Chart.min.js');
                 break;
 
             case 'chartist':
-                $this->includeJs('//cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js');
-                $this->includeCss('//cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.css');
-                $this->jsFiles[] = 'js/chartist.js';
+                $this->includeJs('//cdn.jsdelivr.net/npm/chartist@' . CHARTIST_VERSION . '/dist/chartist.min.js');
+                $this->includeCss('//cdn.jsdelivr.net/npm/chartist@' . CHARTIST_VERSION . '/dist/chartist.min.css');
                 break;
         }
+
+        $this->jsFiles[] = 'js/' . $lib . '.js';
     }
 
     /**
      * Get configuration fields according to the chosen library.
      */
-    function getConfigFields($project_id) {
+    function getConfigFieldsInfo($project_id) {
+        $lib = $this->getProjectSetting('chart_lib', $project_id);
+        $mod_link = $this->getModuleLink();
+        $lib_link = $this->getChartLibraryLink($lib);
+
+        $helper = 'JS objects only. Check out ' . $mod_link . ' documentation to know how to fill out chart configuration fields.';
+        $helper .= ' Check also ' . $lib_link . ' oficial website for documentation and examples.';
+
         $config = array(
-            'chart_type' => array('type' => 'select', 'label' => 'Chart type'),
-            'chart_data' => array('type' => 'json', 'label' => 'Chart data'),
-            'chart_options' => array('type' => 'json', 'label' => 'Chart options'),
+            'chart_type' => array('type' => 'select', 'label' => 'Chart type', 'required' => true),
+            'chart_data' => array('type' => 'json', 'label' => 'Chart data', 'required' => true, 'helper' => $helper),
+            'chart_options' => array('type' => 'json', 'label' => 'Chart options', 'helper' => $helper),
         );
 
-        switch ($this->getProjectSetting('chart_lib', $project_id)) {
-            // TODO: add width and height fields.
+        switch ($lib) {
             case 'chartjs':
+                $config['chart_width'] = array('type' => 'int', 'label' => 'Canvas width');
+                $config['chart_height'] = array('type' => 'int', 'label' => 'Canvas height');
                 $config['chart_type']['choices'] = array(
                     'line' => 'Line',
                     'bar' => 'Bar',
+                    'horizontalBar' => 'Horizontal bar',
                     'radar' => 'Radar',
                     'pie' => 'Pie',
                     'doughnut' => 'Doughnut',
@@ -154,7 +168,12 @@ class ExternalModule extends AbstractExternalModule {
                 break;
 
             case 'chartist':
-                $config['chart_responsive_options'] =  array('type' => 'json', 'label' => 'Chart responsive options');
+                $config['chart_responsive_options'] = array(
+                    'type' => 'array',
+                    'label' => 'Chart responsive options',
+                    'helper' => str_replace('objects', 'arrays', $helper)
+                );
+
                 $config['chart_type']['choices'] = array(
                     'Bar' => 'Bar',
                     'Line' => 'Line',
@@ -168,23 +187,70 @@ class ExternalModule extends AbstractExternalModule {
     }
 
     /**
-     * Builds configuration fields for online designer..
+     * Gets a labeled link to module's GitHub page.
      */
-    protected function buildChartConfigFields() {
+    function getModuleLink() {
+        $config = $this->getConfig();
+        return RCView::a(array('href' => 'https://github.com/ctsit/redcap_chart_field', 'target' => '_blank'), RCView::b($config['name']));
+    }
+
+    /**
+     * Gets a labeled link to the given library's official website.
+     */
+    function getChartLibraryLink($lib = null, $project_id = null) {
+        if (!$lib) {
+            $lib = $this->getProjectSetting('chart_lib', $project_id);
+        }
+
+        $config = $this->getConfig();
+        foreach ($config['project-settings'] as $setting) {
+            if ($setting['key'] == 'chart_lib') {
+                break;
+            }
+        }
+
+        foreach ($setting['choices'] as $option) {
+            if ($option['value'] == $lib) {
+                return $option['name'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Builds configuration fields for online designer.
+     */
+    protected function buildConfigFormFields() {
         $output = '';
 
         foreach ($this->jsSettings['configFields'] as $name => $info) {
             switch ($info['type']) {
                 case 'select':
-                    $field = RCView::select(array('name' => $name), $this->jsSettings['configFields'][$name]['choices']);
+                    $field = RCView::select(array(
+                        'name' => $name,
+                        'class' => 'x-form-text x-form-field chart-property-input',
+                    ), $info['choices']);
                     break;
 
                 case 'json':
+                case 'array':
                     $field = RCView::textarea(array(
                         'name' => $name,
-                        'class' => 'x-form-textarea x-form-field json-field',
+                        'class' => 'x-form-textarea x-form-field chart-property-input',
                     ));
                     break;
+
+                case 'int':
+                    $field = RCView::text(array(
+                        'name' => $name,
+                        'class' => 'x-form-text x-form-field chart-property-input',
+                    ));
+                    break;
+            }
+
+            if (!empty($info['helper'])) {
+                $field .= RCView::div(array('class' => 'chart-property-helper'), $info['helper']);
             }
 
             $output .= RCView::div(array('class' => 'chart-property'), RCView::div(array(), RCView::b($info['label'])) . $field);

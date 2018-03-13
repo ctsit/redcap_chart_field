@@ -1,9 +1,20 @@
 .chart-property {
     display: none;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .chart-property textarea {
     height: 100px;
     width: 330px;
+}
+
+.chart-property-helper {
+    color: #888;
+    font-size: 10px;
+    margin-top: 1px;
+    width: 330px;
+}
+
+.chart-property-helper a b {
+    font-size: 10px;
 }
