@@ -30,6 +30,12 @@ $(document).ready(function() {
         // Branching logic on chart fields.
         chartFieldsBranchingLogic();
 
+        $('.piping-helper a').click(function() {
+            // Opening piping helper modal.
+            pipingExplanation();
+            return false;
+        });
+
         // Adding validation on submit.
         var buttons = $(this).dialog('option', 'buttons');
         $.each(buttons, function(i, button) {
@@ -69,13 +75,14 @@ $(document).ready(function() {
             return;
         }
 
+        // Making sure misc field is empty.
+        $('[name="field_annotation"]').val('');
+
         // Skip if this form has been visited already.
         var fieldName = $('input[name="field_name"]').val();
         if (typeof fieldsVisited[fieldName] !== 'undefined') {
             return;
         }
-
-        $('[name="field_annotation"]').val('');
 
         // Setting up default values.
         if (typeof redcapChartField.fields[fieldName] !== 'undefined') {

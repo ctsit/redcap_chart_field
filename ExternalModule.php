@@ -96,7 +96,7 @@ class ExternalModule extends AbstractExternalModule {
             }
 
             foreach ($this->jsSettings['configFields'] as $key => $info) {
-                if ($info['type'] == 'json' || $info['type'] == 'array') {
+                if (!empty($info['piping'])) {
                     $config[$key] = $this->__piping($config[$key], $record, $event_id, $instance);
                 }
             }
@@ -144,9 +144,24 @@ class ExternalModule extends AbstractExternalModule {
         $helper .= ' Check also ' . $lib_link . ' oficial website for documentation and examples.';
 
         $config = array(
-            'chart_type' => array('type' => 'select', 'label' => 'Chart type', 'required' => true),
-            'chart_data' => array('type' => 'json', 'label' => 'Chart data', 'required' => true, 'helper' => $helper),
-            'chart_options' => array('type' => 'json', 'label' => 'Chart options', 'helper' => $helper),
+            'chart_type' => array(
+                'type' => 'select',
+                'label' => 'Chart type',
+                'required' => true,
+            ),
+            'chart_data' => array(
+                'type' => 'json',
+                'label' => 'Chart data',
+                'required' => true,
+                'helper' => $helper,
+                'piping' => true,
+            ),
+            'chart_options' => array(
+                'type' => 'json',
+                'label' => 'Chart options',
+                'helper' => $helper,
+                'piping' => true,
+            ),
         );
 
         switch ($lib) {
@@ -171,7 +186,8 @@ class ExternalModule extends AbstractExternalModule {
                 $config['chart_responsive_options'] = array(
                     'type' => 'array',
                     'label' => 'Chart responsive options',
-                    'helper' => str_replace('objects', 'arrays', $helper)
+                    'helper' => str_replace('objects', 'arrays', $helper),
+                    'piping' => true,
                 );
 
                 $config['chart_type']['choices'] = array(
@@ -222,8 +238,13 @@ class ExternalModule extends AbstractExternalModule {
      * Builds configuration fields for online designer.
      */
     protected function buildConfigFormFields() {
-        $output = '';
+        global $lang;
 
+        $piping = RCView::img(array('src' => APP_PATH_IMAGES . 'pipe_small.gif')) . ' ';
+        $piping .= RCView::a(array('href' => '#'), $lang['design_456']);
+        $piping = RCView::div(array('class' => 'piping-helper'), $piping);
+
+        $output = '';
         foreach ($this->jsSettings['configFields'] as $name => $info) {
             switch ($info['type']) {
                 case 'select':
@@ -253,7 +274,12 @@ class ExternalModule extends AbstractExternalModule {
                 $field .= RCView::div(array('class' => 'chart-property-helper'), $info['helper']);
             }
 
-            $output .= RCView::div(array('class' => 'chart-property'), RCView::div(array(), RCView::b($info['label'])) . $field);
+            $label = RCView::div(array('class' => 'chart-property-label'), RCView::b($info['label']));
+            if (!empty($info['piping'])) {
+                $label .= $piping;
+            }
+
+            $output .= RCView::div(array('class' => 'chart-property'), RCView::div(array('class' => 'clearfix'), $label) . $field);
         }
 
         $this->jsSettings['onlineDesignerContents'] = $output;
