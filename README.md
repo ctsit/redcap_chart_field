@@ -1,5 +1,5 @@
 # REDCap Chart Field
-Provides a field type for charts by using a library of your choice - [Charts.js](http://www.chartjs.org/) or [Chartist](https://gionkunz.github.io/chartist-js/). Supports Piping on field configuration, so it can be used to display facts to survey participants based on their previous answers.
+Provides a field type for charts by using a library of your choice - [Charts.js](http://www.chartjs.org/) or [Chartist](https://gionkunz.github.io/chartist-js/). Supports [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php) on field configuration, so it can be used to display facts to survey participants based on their previous answers.
 
 ## Prerequisites
 - REDCap >= 8.0.3
@@ -17,7 +17,7 @@ Two amazing chart libraries are supported by this module - Chart.js and Chartist
 
 This section will walk you through a chart field setup with Piping using Chart.js library.
 
-### Chart source data
+### Chart source data (for Piping purposes)
 The data below represent the source of our chart. Obs.: in this example, the field keys are set as `data_1`, `data_2`, etc (that will be important for Piping later on).
 
 ![Chartist source data](img/chart_source_data.png)
@@ -250,10 +250,12 @@ __3. Responsive options:__
 
 That's how the input on REDCap looks like. Note that the configuration for Chartist is slightly different - there is no canvas dimensions fields, and "Chart responsive options" field is added. Check the official Chartist documentation to understand how it works.
 
+Note that we are using Piping again to make chart data dinamic.
+
 Obs.: width and height have been manually added to __Options__ field to exemplify that is also possible to define chart dimensions with Chartist.
 
 ![Chartist configuration](img/chartist_config.png)
 
-Note that we are using Piping again to make chart data dinamic. And here is the result!
+And here is the result!
 
 ![Chartist chart](img/chartist_chart.png)
