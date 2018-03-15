@@ -18,7 +18,7 @@ Two amazing chart libraries are supported by this module - Chart.js and Chartist
 This section will walk you through a chart field setup with Piping using Chart.js library.
 
 ### Chart source data
-The data below represent the source of our chart. Obs.: in this example, the field keys are set as `data_1`, `data_2`, etc.
+The data below represent the source of our chart. Obs.: in this example, the field keys are set as `data_1`, `data_2`, etc (that will be important for Piping later on).
 
 ![Chartist source data](img/chart_source_data.png)
 
@@ -35,7 +35,7 @@ Despite this sounds very technical, no development skills are required to manipu
 
 Let's create a bar chart from [the main example from Chart.js official documentation](http://www.chartjs.org/docs/latest/#creating-a-chart).
 
-<details><summary>_Click to see the code provided by them_</summary>
+<details><summary>Click to see the code provided by them</summary>
 
 ``` html
 <canvas id="myChart" width="400" height="400"></canvas>
@@ -82,7 +82,7 @@ var myChart = new Chart(ctx, {
 
 </details>
 
-Translating it to our fields:
+Mapping the code above into our configuration fields:
 
 __1. Type:__ Bar
 
@@ -93,7 +93,7 @@ __2. Data__:
     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
     datasets: [{
         label: '# of Votes',
-        data: ['[data_1]', '[data_2]', '[data_3]', '[data_4]', '[data_5]', '[data_6]'],
+        data: [12, 19, 3, 5, 2, 3],
         backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
             'rgba(54, 162, 235, 0.2)',
@@ -129,9 +129,9 @@ __3. Options:__
 }
 ```
 
-__4. Canvas width:__ Any number you want (in px)
+__4. Canvas width:__ The desired width (in px)
 
-__5. Canvas height:__ Any number you want (in px)
+__5. Canvas height:__ The desired height (in px)
 
 Thus, the field creation form looks like that:
 
@@ -144,11 +144,11 @@ For this particular case - remember the input given on __Chart source data__ sec
 ![Chartjs chart](img/chartjs_chart.png)
 
 ## Chartist example
-Here is the analogous example for Chartist library, using the same source data - this time drawing a line chart instead.
+In this section we will go through the analogous example for Chartist library, using the same source data - this time drawing a line chart instead.
 
-The setup process by taking a [Chartist example](https://gionkunz.github.io/chartist-js/#responsive-charts-configuration) as base is quite similar:
+The process of taking a [Chartist example](https://gionkunz.github.io/chartist-js/#responsive-charts-configuration) as base for configuration is quite similar the previous section.
 
-<details><summary>_Click to see the code provided by them_</summary>
+<details><summary>Click to see the code provided by them</summary>
 
 ``` javascript
 /* Add a basic data series with six labels and values */
@@ -196,7 +196,7 @@ new Chartist.Line('#my-chart', data, options, responsiveOptions);
 
 </details>
 
-Again, __you don't need to be a developer__ to manipulate this information - it's just a copy & paste work. That's how the code above is translated into our form fields:
+Again, __you don't need to be a developer__ to manipulate this information - it's just a copy & paste work. That's how the code above is mapped into our form fields:
 
 __1. Type:__ Line
 
@@ -228,20 +228,32 @@ __3. Options:__
 __3. Responsive options:__
 
 ``` javascript
-{
-  axisX: {
-    labelInterpolationFnc: function(value) {
-      return 'Calendar Week ' + value;
+[
+  ['screen and (min-width: 641px) and (max-width: 1024px)', {
+    showPoint: false,
+    axisX: {
+      labelInterpolationFnc: function(value) {
+        return 'Week ' + value;
+      }
     }
-  }
-}
+  }],
+  ['screen and (max-width: 640px)', {
+    showLine: false,
+    axisX: {
+      labelInterpolationFnc: function(value) {
+        return 'W' + value;
+      }
+    }
+  }]
+]
 ```
 
 That's how the input on REDCap looks like. Note that the configuration for Chartist is slightly different - there is no canvas dimensions fields, and "Chart responsive options" field is added. Check the official Chartist documentation to understand how it works.
+
+Obs.: width and height have been manually added to __Options__ field to exemplify that is also possible to define chart dimensions with Chartist.
 
 ![Chartist configuration](img/chartist_config.png)
 
 Note that we are using Piping again to make chart data dinamic. And here is the result!
 
 ![Chartist chart](img/chartist_chart.png)
-
