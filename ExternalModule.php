@@ -43,7 +43,11 @@ class ExternalModule extends AbstractExternalModule {
                 }
             }
 
+            // Using misc field to store chart metadata.
             $_POST['field_annotation'] = json_encode($misc);
+
+            // Chart fields do not support labels.
+            $_POST['field_label'] = '';
         }
 
         global $Proj;
@@ -52,6 +56,7 @@ class ExternalModule extends AbstractExternalModule {
                 continue;
             }
 
+            // Transfering chart metadata from misc field to JS settings array.
             $this->jsSettings['fields'][$field] = json_decode($Proj->metadata[$field]['misc'], true);
             $Proj->metadata[$field]['misc'] = '';
         }
@@ -89,6 +94,7 @@ class ExternalModule extends AbstractExternalModule {
     function loadCharts($instrument, $record, $event_id, $instance) {
         global $Proj;
 
+        // Getting the list of charts for the current form.
         $filtered = array();
         foreach ($this->jsSettings['fields'] as $field_name => $config) {
             if ($Proj->metadata[$field_name]['form_name'] != $instrument) {
@@ -97,6 +103,7 @@ class ExternalModule extends AbstractExternalModule {
 
             foreach ($this->jsSettings['configFields'] as $key => $info) {
                 if (!empty($info['piping'])) {
+                    // Applying Piping on chart data.
                     $config[$key] = $this->__piping($config[$key], $record, $event_id, $instance);
                 }
             }

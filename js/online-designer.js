@@ -4,14 +4,21 @@ $(document).ready(function() {
         var fieldType = $fieldSelector.val();
 
         if (fieldType === 'chart') {
+            // Showing chart fields.
             $('.chart-property').show();
+
+            // Hiding misc and label fields.
             $('#div_field_annotation').hide();
+            $label.hide();
         }
         else {
+            // Hiding chart fields.
             $('.chart-property').hide();
 
+            // Showing misc and label fields.
             if (fieldType !== 'section_header') {
                 $('#div_field_annotation').show();
+                $label.show();
             }
         }
     }
@@ -47,6 +54,7 @@ $(document).ready(function() {
             buttons[i].click = function() {
                 if ($fieldSelector.val() !== 'chart') {
                     callback();
+                    return;
                 }
 
                 var success = true;
@@ -78,8 +86,29 @@ $(document).ready(function() {
         // Making sure misc field is empty.
         $('[name="field_annotation"]').val('');
 
-        // Skip if this form has been visited already.
         var fieldName = $('input[name="field_name"]').val();
+        if (!fieldName) {
+            // Handling the case when the user opens a new field dialog just
+            // after adding/editing a chart field.
+
+            // Reseting chart fields values.
+            $('.chart-property-input').each(function() {
+                if ($(this).is('select')) {
+                    $(this).prop('selectedIndex', 0);
+                }
+                else {
+                    $(this).val('');
+                }
+            });
+
+            // Unselecting chart field option.
+            $fieldSelector.prop('selectedIndex', 0);
+            $fieldSelector.change();
+
+            return;
+        }
+
+        // Skip if this form has been visited already.
         if (typeof fieldsVisited[fieldName] !== 'undefined') {
             return;
         }
@@ -90,14 +119,11 @@ $(document).ready(function() {
                 $target = $('[name="' + key + '"');
 
                 switch (redcapChartField.configFields[key].type) {
-                    case 'int':
-                    case 'json':
-                    case 'array':
-                        $target.val(value);
-                        break;
                     case 'select':
                         $target.children('option[value="' + value +'"]').prop('selected', true);
                         break;
+                    default:
+                        $target.val(value);
                 }
             });
         }
