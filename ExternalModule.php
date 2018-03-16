@@ -258,7 +258,7 @@ class ExternalModule extends AbstractExternalModule {
                     $field = RCView::select(array(
                         'name' => $name,
                         'class' => 'x-form-text x-form-field chart-property-input',
-                    ), $info['choices']);
+                    ), array('' => '--- Select ---') + $info['choices']);
                     break;
 
                 case 'json':

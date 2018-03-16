@@ -9,33 +9,40 @@ Provides a field type for charts by using a library of your choice - [Charts.js]
 - Go to **Control Center > Manage External Modules** and enable REDCap Chart Field.
 
 ## Choosing your chart library
-Two amazing chart libraries are supported by this module - Chart.js and Chartist.
+Two amazing third-party chart libraries are supported by this module - Chart.js and Chartist.
 
 ![Configuration screen](img/config_screen.png)
 
 ## Setting up a chart field (Chart.js example)
+This section will walk you through a few steps to setup a [Charts.js](http://www.chartjs.org/) chart, dinamically populated via [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php).
 
-This section will walk you through a chart field setup with Piping using Chart.js library.
+### 1. Setting up source data (for Piping purposes)
 
-### Chart source data (for Piping purposes)
-The data below represent the source of our chart. Obs.: in this example, the field keys are set as `data_1`, `data_2`, etc (that will be important for Piping later on).
+The following fields are responsible to populate our chart example. Pay attention at the variable names - they will be referenced later on.
+
+![Chartist source data configuration](img/chart_source_data_config.png)
+
+And that's the particular data set we are going to use.
 
 ![Chartist source data](img/chart_source_data.png)
 
-### Creating a chart field
-To create a chart field, go throught the usual field creation procedure, this time selecting the new field type provided by this module - Chart.
+### 2. Creating a chart field
+To create a chart field, go throught the usual field creation procedure on Online Designer, this time selecting the new field type provided by this module - Chart.
 
 ![Field type](img/field_type.png)
 
+### 3. Mapping an example provided by the selected third-party library
+Once you select the Chart field type, a few extra fields are shown:
 
-### Set up chart parameters
-Once you select the Chart field type, a few fields will show up on your screen. For this step is really important to get familiar with the documentation of the chart library you chose, since the inputs are expected to be JS objects that follow a syntax defined by the library.
+![Chartjs configuration](img/chartjs_config_empty.png)
 
-Despite this sounds very technical, no development skills are required to manipulate these parameters - most of cases it is just a matter of copying & pasting pieces of examples from documentation - and minimally adapting them to your case.
+To fill these fields out it is very important to get familiar with the documentation provided by the third-party chart library you chose, since the inputs are expected to be Javascript objects that follow a particular structure defined by the library.
 
-Let's create a bar chart from [the main example from Chart.js official documentation](http://www.chartjs.org/docs/latest/#creating-a-chart).
+Despite this sounds very technical, no development skills are required to manipulate these parameters - for most of cases it's just a matter of copying & pasting a suitable example from documentation - and making slight changes to adapt it to your needs.
 
-<details><summary>Click to see the code provided by them</summary>
+Let's create a _bar_ chart by using [the main example from Chart.js official documentation](http://www.chartjs.org/docs/latest/#creating-a-chart) as base.
+
+<details><summary>Click to see the code provided by Chart.js website</summary>
 
 ``` html
 <canvas id="myChart" width="400" height="400"></canvas>
@@ -81,11 +88,12 @@ var myChart = new Chart(ctx, {
 ```
 
 </details>
+&nbsp;
 
-Mapping the code above into our configuration fields:
+Mapping the code above into REDCap Chart Field properties:
 
 __1. Type:__ Bar
-
+<br>
 __2. Data__:
 
 ``` javascript
@@ -129,26 +137,32 @@ __3. Options:__
 }
 ```
 
-__4. Canvas width:__ The desired width (in px)
+__4. Canvas width:__ 400
+<br>
+__5. Canvas height:__ 400
 
-__5. Canvas height:__ The desired height (in px)
 
-Thus, the field creation form looks like that:
+### 4. Setting up chart properties
+
+Let's finally transfer the mapping into the form:
 
 ![Chartjs configuration](img/chartjs_config.png)
 
-Note the highlighted area on image above - Piping is being used in order to dinamically populate the chart data. So each record entry or survey will result in different chart data!
+Note the highlighted area on image above - Piping is being used in order to dinamically populate the chart data (`[data_1]`, `[data_2]`, etc) - so each record entry or survey has its own chart results.
 
-For this particular case - remember the input given on __Chart source data__ section - we have the following result chart:
+Obs.: as the example above, Piping wildcards must be used between quotes (single or double), e.g. `'[data_1]'`.
+
+### 5. The result
+For this particular case - remember the input given on [Chart source data section](#chart-source-data-for-piping-purposes) - we have the following result chart when accessing the field in a survey:
 
 ![Chartjs chart](img/chartjs_chart.png)
 
-## Chartist example
-In this section we will go through the analogous example for Chartist library, using the same source data - this time drawing a line chart instead.
+## Analogous example using Chartist
+In this section we will go through the analogous example for Chartist library, using the same source data. This time we'll draw a _line_ chart.
 
-The process of taking a [Chartist example](https://gionkunz.github.io/chartist-js/#responsive-charts-configuration) as base for configuration is quite similar the previous section.
+The process of mapping a [Chartist example](https://gionkunz.github.io/chartist-js/#responsive-charts-configuration) is quite similar what we've seen in the previous section.
 
-<details><summary>Click to see the code provided by them</summary>
+<details><summary>Click to see the code provided by Chartist website</summary>
 
 ``` javascript
 /* Add a basic data series with six labels and values */
@@ -195,11 +209,12 @@ new Chartist.Line('#my-chart', data, options, responsiveOptions);
 ```
 
 </details>
+&nbsp;
 
-Again, __you don't need to be a developer__ to manipulate this information - it's just a copy & paste work. That's how the code above is mapped into our form fields:
+Again, __you don't need to be a developer__ to manipulate this information - it's just a copy & paste work. That's how the code above is mapped into the form fields:
 
 __1. Type:__ Line
-
+<br>
 __2. Data__:
 
 ``` javascript
@@ -248,13 +263,15 @@ __3. Responsive options:__
 ]
 ```
 
-That's how the input on REDCap looks like. Note that the configuration for Chartist is slightly different - there is no canvas dimensions fields, and "Chart responsive options" field is added. Check the official Chartist documentation to understand how it works.
-
-Note that we are using Piping again to make chart data dinamic.
-
-Obs.: width and height have been manually added to __Options__ field to exemplify that is also possible to define chart dimensions with Chartist.
+Filling out the form:
 
 ![Chartist configuration](img/chartist_config.png)
+
+As we've done on Chart.js section, we are using Piping to make chart data dinamic.
+
+Note that the configuration for Chartist is slightly different - there is no canvas dimensions fields, and "Chart responsive options" field is added. Check the [official Chartist documentation](https://gionkunz.github.io/chartist-js/) to understand how it works.
+
+Obs.: width and height have been manually added to __Chart options__ field to exemplify that is also possible to define chart dimensions with Chartist.
 
 And here is the result!
 
