@@ -14,7 +14,7 @@ Two amazing third-party chart libraries are supported by this module - Chart.js 
 ![Configuration screen](img/config_screen.png)
 
 ## Setting up a chart field (Chart.js example)
-This section will walk you through a few steps to setup a [Charts.js](http://www.chartjs.org/) chart, dinamically populated via [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php).
+This section will walk you through a few steps to setup a [Charts.js](http://www.chartjs.org/) chart, dynamically populated via [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php).
 
 ### 1. Setting up source data (for Piping purposes)
 
@@ -148,7 +148,7 @@ Let's finally transfer the mapping into the form:
 
 ![Chartjs configuration](img/chartjs_config.png)
 
-Note the highlighted area on image above - Piping is being used in order to dinamically populate the chart data (`[data_1]`, `[data_2]`, etc) - so each record entry or survey has its own chart results.
+Note the highlighted area on image above - Piping is being used in order to dynamically populate the chart data (`[data_1]`, `[data_2]`, etc) - so each record entry or survey has its own chart results.
 
 Obs.: as the example above, Piping wildcards must be used between quotes (single or double), e.g. `'[data_1]'`.
 
@@ -267,7 +267,7 @@ Filling out the form:
 
 ![Chartist configuration](img/chartist_config.png)
 
-As we've done on Chart.js section, we are using Piping to make chart data dinamic.
+As we've done on Chart.js section, we are using Piping to make chart data dynamic.
 
 Note that the configuration for Chartist is slightly different - there is no canvas dimensions fields, and "Chart responsive options" field is added. Check the [official Chartist documentation](https://gionkunz.github.io/chartist-js/) to understand how it works.
 
