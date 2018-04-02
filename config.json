@@ -1,0 +1,49 @@
+{
+    "name": "REDCap Chart Field",
+    "namespace": "REDCapChartField\\ExternalModule",
+    "description": "Provides a field type for charts by using <a href=\"http://www.chartjs.org/\" target=\"_blank\"><b>Chart.js</b></a> or <a href=\"https://gionkunz.github.io/chartist-js/\" target=\"_blank\"><b>Chartist</b></a> libraries. Supports Piping on field configuration.",
+    "permissions": [
+        "redcap_every_page_before_render",
+        "redcap_every_page_top",
+        "redcap_data_entry_form_top",
+        "redcap_survey_page_top"
+    ],
+    "authors": [
+        {
+            "name": "Philip Chase",
+            "email": "pbc@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Taryn Stoffs",
+            "email": "tls@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Marly Cormar",
+            "email": "marlycormar@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Tiago Bember",
+            "email": "tbembersimeao@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        }
+    ],
+    "project-settings": [
+        {
+            "key": "chart_lib",
+            "name": "Library",
+            "required": true,
+            "type": "radio",
+            "default": "chartjs",
+            "choices": [
+                {"value": "chartjs", "name": "<a href=\"http://www.chartjs.org/\" target=\"_blank\"><b>Chart.js</b></a>"},
+                {"value": "chartist", "name": "<a href=\"https://gionkunz.github.io/chartist-js/\" target=\"_blank\"><b>Chartist</b></a>"}
+            ]
+        }
+    ],
+    "compatibility": {
+        "redcap-version-min": "8.0.3"
+    }
+}
