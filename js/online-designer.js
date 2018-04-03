@@ -9,7 +9,6 @@ $(document).ready(function() {
 
             // Hiding misc and label fields.
             $('#div_field_annotation').hide();
-            $label.hide();
         }
         else {
             // Hiding chart fields.
@@ -18,7 +17,6 @@ $(document).ready(function() {
             // Showing misc and label fields.
             if (fieldType !== 'section_header') {
                 $('#div_field_annotation').show();
-                $label.show();
             }
         }
     }
@@ -34,6 +32,12 @@ $(document).ready(function() {
     // Showing or hiding chart fields based on field type selection.
     $fieldSelector.change(chartFieldsBranchingLogic);
     $('#div_add_field').on('dialogopen', function() {
+        var fieldName = $('input[name="field_name"]').val();
+        if (fieldName && typeof redcapChartField.fields[fieldName] !== 'undefined') {
+            $fieldSelector.find('option[value="chart"]').prop('selected', true);
+            $fieldSelector.change();
+        }
+
         // Branching logic on chart fields.
         chartFieldsBranchingLogic();
 
@@ -52,8 +56,12 @@ $(document).ready(function() {
 
             var callback = button.click;
             buttons[i].click = function() {
+                // Updating field name value.
+                fieldName = $('input[name="field_name"]').val();
+
                 if ($fieldSelector.val() !== 'chart') {
                     callback();
+                    delete redcapChartField.fields[fieldName];
                     return;
                 }
 
@@ -69,8 +77,12 @@ $(document).ready(function() {
                     return false;
                 }
 
-                fieldsVisited[fieldName] = true;
                 callback();
+
+                fieldsVisited[fieldName] = true;
+                if (typeof redcapChartField.fields[fieldName] === 'undefined') {
+                    redcapChartField.fields[fieldName] = true;
+                }
             }
 
             return false;
@@ -86,7 +98,6 @@ $(document).ready(function() {
         // Making sure misc field is empty.
         $('[name="field_annotation"]').val('');
 
-        var fieldName = $('input[name="field_name"]').val();
         if (!fieldName) {
             // Handling the case when the user opens a new field dialog just
             // after adding/editing a chart field.
@@ -127,5 +138,26 @@ $(document).ready(function() {
                 }
             });
         }
+    });
+
+    // Handling chart field copy.
+    var copyingChartField = false;
+    var copyFieldDoOld = copyFieldDo;
+
+    copyFieldDo = function(fieldName) {
+        if (typeof redcapChartField.fields[fieldName] !== 'undefined') {
+            copyingChartField = fieldName;
+        }
+
+        copyFieldDoOld(fieldName);
+    }
+
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if (!copyingChartField || settings.url.indexOf(app_path_webroot + 'Design/copy_field.php') !== 0) {
+            return;
+        }
+
+        redcapChartField.fields[xhr.responseText] = redcapChartField.fields[copyingChartField];
+        copyingChartField = false;
     });
 });
