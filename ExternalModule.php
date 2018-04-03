@@ -354,8 +354,9 @@ class ExternalModule extends AbstractExternalModule {
     protected function __piping($str, $record, $event_id, $instance) {
         $tmp = ' [!!!TEMP!!!]';
 
-        $str = str_replace(']', ']' . $tmp, $str);
+        $str = preg_replace('/(\[[^\[^\]]*\])+/', '$0' . $tmp, $str);
         $str = Piping::replaceVariablesInLabel($str, $record, $event_id, $instance, array(), true, null, false);
+
         return str_replace($tmp, '', $str);
     }
 }
