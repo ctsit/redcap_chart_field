@@ -33,9 +33,28 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
+        global $Proj;
+        foreach ($Proj->metadata as $field => $info) {
+            if ($info['element_type'] != 'chart') {
+                continue;
+            }
+
+            // Transfering chart metadata from misc field to JS settings array.
+            $this->jsSettings['fields'][$field] = json_decode($Proj->metadata[$field]['misc'], true);
+        }
+
         $this->jsSettings['configFields'] = $this->getConfigFieldsInfo($project_id);
 
-        if (PAGE === 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'chart') {
+
+        if (in_array(PAGE, array('Design/online_designer.php', 'Design/online_designer_render_fields.php', 'DataExport/data_export_ajax.php'))) {
+            foreach (array_keys($this->jsSettings['fields']) as $field) {
+                // A little trick to:
+                //   1. Show up label on Online Designer
+                //   2. Do not include chart field on Data Export
+                $Proj->metadata[$field]['element_type'] = 'descriptive';
+            }
+        }
+        elseif (PAGE === 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'chart') {
             $misc = array();
             foreach (array_keys($this->jsSettings['configFields']) as $field) {
                 if (!empty($_POST[$field])) {
@@ -45,24 +64,6 @@ class ExternalModule extends AbstractExternalModule {
 
             // Using misc field to store chart metadata.
             $_POST['field_annotation'] = json_encode($misc);
-        }
-
-        global $Proj;
-        foreach ($Proj->metadata as $field => $info) {
-            if ($info['element_type'] != 'chart') {
-                continue;
-            }
-
-            // Transfering chart metadata from misc field to JS settings array.
-            $this->jsSettings['fields'][$field] = json_decode($Proj->metadata[$field]['misc'], true);
-            $Proj->metadata[$field]['misc'] = '';
-        }
-
-        if (in_array(PAGE, array('Design/online_designer.php', 'Design/online_designer_render_fields.php'))) {
-            foreach (array_keys($this->jsSettings['fields']) as $field) {
-                // A little trick to make the label show up on Online Designer.
-                $Proj->metadata[$field]['element_type'] = 'descriptive';
-            }
         }
     }
 
