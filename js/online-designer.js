@@ -1,45 +1,51 @@
 $(document).ready(function() {
     var fieldsVisited = {};
-    var chartFieldsBranchingLogic = function() {
-        var fieldType = $fieldSelector.val();
 
-        if (fieldType === 'chart') {
-            // Showing chart fields.
-            $('.chart-property').show();
+    // Adding chart config fields to markup.
+    $('#quesTextDiv > table > tbody > tr > td:first > div:first').append(redcapChartField.onlineDesignerContents.left);
+    $('#quesTextDiv > table > tbody > tr > td:last').append(redcapChartField.onlineDesignerContents.right);
 
-            // Hiding misc and label fields.
-            $('#div_field_annotation').hide();
-        }
-        else {
-            // Hiding chart fields.
-            $('.chart-property').hide();
-
-            // Showing misc and label fields.
-            if (fieldType !== 'section_header') {
-                $('#div_field_annotation').show();
-            }
-        }
-    }
-
-    // Adding extra config fields.
-    var $label = $('#quesTextDiv > table > tbody > tr > td').first().children('div').first();
-    $label.after(redcapChartField.onlineDesignerContents);
-
-    // Adding chart option.
     var $fieldSelector = $('select[name="field_type"]');
-    $fieldSelector.append('<option value="chart">Chart</option>');
+    var $chartFlag = $('input[name="is_chart"]');
 
-    // Showing or hiding chart fields based on field type selection.
-    $fieldSelector.change(chartFieldsBranchingLogic);
+    // Showing or hiding chart fields based on field type selection and the
+    // chart flag.
+    $fieldSelector.change(redcapChartField.doBranching);
+    $chartFlag.change(redcapChartField.doBranching);
+
     $('#div_add_field').on('dialogopen', function() {
         var fieldName = $('input[name="field_name"]').val();
+
         if (fieldName && typeof redcapChartField.fields[fieldName] !== 'undefined') {
-            $fieldSelector.find('option[value="chart"]').prop('selected', true);
-            $fieldSelector.change();
+            // Turning chart flag on.
+            $chartFlag.prop('checked', true);
+
+            // Making sure misc field is empty.
+            $('[name="field_annotation"]').val('');
+
+            if (typeof fieldsVisited[fieldName] === 'undefined') {
+                // Setting up default values.
+                $.each(redcapChartField.fields[fieldName], function(key, value) {
+                    $target = $('[name="' + key + '"');
+
+                    if (redcapChartField.configFields[key].type === 'select') {
+                        $target.children('option[value="' + value +'"]').prop('selected', true);
+                    }
+                    else {
+                        $target.val(value);
+                    }
+                });
+            }
+        }
+        else {
+            // Making sure all chart fields are blank if the current form is not
+            // a chart field.
+            $chartFlag.prop('checked', false);
+            $('.chart-property-input').val('');
         }
 
         // Branching logic on chart fields.
-        chartFieldsBranchingLogic();
+        redcapChartField.doBranching();
 
         $('.piping-helper a').click(function() {
             // Opening piping helper modal.
@@ -59,7 +65,7 @@ $(document).ready(function() {
                 // Updating field name value.
                 fieldName = $('input[name="field_name"]').val();
 
-                if ($fieldSelector.val() !== 'chart') {
+                if ($fieldSelector.val() !== 'descriptive' || !$chartFlag.is(':checked')) {
                     callback();
                     delete redcapChartField.fields[fieldName];
                     return;
@@ -89,55 +95,6 @@ $(document).ready(function() {
         });
 
         $(this).dialog('option', 'buttons', buttons);
-
-        // Skip if this is not a chart field.
-        if ($fieldSelector.val() !== 'chart') {
-            return;
-        }
-
-        // Making sure misc field is empty.
-        $('[name="field_annotation"]').val('');
-
-        if (!fieldName) {
-            // Handling the case when the user opens a new field dialog just
-            // after adding/editing a chart field.
-
-            // Reseting chart fields values.
-            $('.chart-property-input').each(function() {
-                if ($(this).is('select')) {
-                    $(this).prop('selectedIndex', 0);
-                }
-                else {
-                    $(this).val('');
-                }
-            });
-
-            // Unselecting chart field option.
-            $fieldSelector.prop('selectedIndex', 0);
-            $fieldSelector.change();
-
-            return;
-        }
-
-        // Skip if this form has been visited already.
-        if (typeof fieldsVisited[fieldName] !== 'undefined') {
-            return;
-        }
-
-        // Setting up default values.
-        if (typeof redcapChartField.fields[fieldName] !== 'undefined') {
-            $.each(redcapChartField.fields[fieldName], function(key, value) {
-                $target = $('[name="' + key + '"');
-
-                switch (redcapChartField.configFields[key].type) {
-                    case 'select':
-                        $target.children('option[value="' + value +'"]').prop('selected', true);
-                        break;
-                    default:
-                        $target.val(value);
-                }
-            });
-        }
     });
 
     // Handling chart field copy.
