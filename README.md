@@ -1,5 +1,5 @@
 # REDCap Chart Field
-Provides a field type for charts by using a library of your choice - [Charts.js](http://www.chartjs.org/) or [Chartist](https://gionkunz.github.io/chartist-js/). Supports [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php) on field configuration, so it can be used to display facts to survey participants based on their previous answers.
+Provides a chart drawing feature for data entries and surveys. Integrates REDCap with third-party chart libraries - currently [Charts.js](http://www.chartjs.org/) and [Chartist](https://gionkunz.github.io/chartist-js/) are supported. [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php) can be used on field configuration, so charts may display facts to survey participants based on their previous answers.
 
 ## Prerequisites
 - REDCap >= 8.0.3
@@ -27,12 +27,12 @@ To configure a chart it helps to have data in the input fields.  For this exampl
 ![Chart.js source data](img/chart_source_data.png)
 
 ### 2. Creating a chart field
-To create a chart field, go through the usual field creation procedure in Online Designer, this time selecting the new field type provided by this module - Chart.
+To create a chart field, access Online Designer's field creation modal, and then select _Descriptive Text_. You may see a checkbox named _Is chart_.
 
 ![Field type](img/field_type.png)
 
 ### 3. Mapping an example provided by the selected third-party library
-Once you select the Chart field type, a few extra fields are shown:
+Once you click on _Is chart_ checkbox, a few extra fields are shown:
 
 ![Chart.js configuration](img/chartjs_config_empty.png)
 
@@ -271,7 +271,7 @@ __3. Responsive options:__
 
 As we've done on Chart.js section, we are using Piping to make chart data dynamic.
 
-Note that the configuration for Chartist is slightly different - there are no canvas dimension fields, and "Chart responsive options" field is added. Check the [official Chartist documentation](https://gionkunz.github.io/chartist-js/) to understand how it works.
+Note that the configuration for Chartist is slightly different - there are no canvas dimension fields, and _Chart responsive options_ field is added. Check the [official Chartist documentation](https://gionkunz.github.io/chartist-js/) to understand how it works.
 
 In our example, width and height are specified to the __Chart options__ field to show that is also possible to define chart dimensions with Chartist.
 

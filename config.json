@@ -1,7 +1,7 @@
 {
     "name": "REDCap Chart Field",
     "namespace": "REDCapChartField\\ExternalModule",
-    "description": "Provides a field type for charts by using <a href=\"http://www.chartjs.org/\" target=\"_blank\"><b>Chart.js</b></a> or <a href=\"https://gionkunz.github.io/chartist-js/\" target=\"_blank\"><b>Chartist</b></a> libraries. Supports Piping on field configuration.",
+    "description": "Provides a chart drawing feature for data entries and surveys. Integrates REDCap with third-party chart libraries - currently <a href=\"http://www.chartjs.org/\" target=\"_blank\"><b>Chart.js</b></a> and <a href=\"https://gionkunz.github.io/chartist-js/\" target=\"_blank\"><b>Chartist</b></a> are supported. Piping can be used on field configuration, so charts may display facts to survey participants based on their previous answers.",
     "permissions": [
         "redcap_every_page_before_render",
         "redcap_every_page_top",
