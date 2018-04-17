@@ -33,9 +33,17 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
+        global $Proj;
+        foreach ($Proj->metadata as $field => $info) {
+            if ($info['element_type'] == 'descriptive' && ($settings = json_decode($Proj->metadata[$field]['misc'], true)) && isset($settings['chart_type'])) {
+                // Transfering chart metadata from misc field to JS settings array.
+                $this->jsSettings['fields'][$field] = $settings;
+            }
+        }
+
         $this->jsSettings['configFields'] = $this->getConfigFieldsInfo($project_id);
 
-        if (PAGE === 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'chart') {
+        if (PAGE == 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'descriptive' && !empty($_POST['is_chart'])) {
             $misc = array();
             foreach (array_keys($this->jsSettings['configFields']) as $field) {
                 if (!empty($_POST[$field])) {
@@ -45,20 +53,6 @@ class ExternalModule extends AbstractExternalModule {
 
             // Using misc field to store chart metadata.
             $_POST['field_annotation'] = json_encode($misc);
-
-            // Chart fields do not support labels.
-            $_POST['field_label'] = '';
-        }
-
-        global $Proj;
-        foreach ($Proj->metadata as $field => $info) {
-            if ($info['element_type'] != 'chart') {
-                continue;
-            }
-
-            // Transfering chart metadata from misc field to JS settings array.
-            $this->jsSettings['fields'][$field] = json_decode($Proj->metadata[$field]['misc'], true);
-            $Proj->metadata[$field]['misc'] = '';
         }
     }
 
@@ -168,13 +162,20 @@ class ExternalModule extends AbstractExternalModule {
                 'label' => 'Chart options',
                 'helper' => $helper,
                 'piping' => true,
+                'is_additional_config' => true,
             ),
         );
 
         switch ($lib) {
             case 'chartjs':
-                $config['chart_width'] = array('type' => 'int', 'label' => 'Canvas width');
-                $config['chart_height'] = array('type' => 'int', 'label' => 'Canvas height');
+                foreach (array('chart_width' => 'Canvas width', 'chart_height' => 'Canvas height') as $key => $label) {
+                    $config[$key] = array(
+                        'type' => 'int',
+                        'label' => $label,
+                        'is_additional_config' => true,
+                    );
+                }
+
                 $config['chart_type']['choices'] = array(
                     'line' => 'Line',
                     'bar' => 'Bar',
@@ -195,6 +196,7 @@ class ExternalModule extends AbstractExternalModule {
                     'label' => 'Chart responsive options',
                     'helper' => str_replace('objects', 'arrays', $helper),
                     'piping' => true,
+                    'is_additional_config' => true,
                 );
 
                 $config['chart_type']['choices'] = array(
@@ -247,17 +249,28 @@ class ExternalModule extends AbstractExternalModule {
     protected function buildConfigFormFields() {
         global $lang;
 
+        $field = RCView::checkbox(array(
+            'name' => 'is_chart',
+            'class' => 'x-form-field chart-config-input',
+        ));
+
+        $output = array(
+            'left' => RCView::div(array('id' => 'chart-flag', 'class' => 'chart-config'), RCView::b('Is chart') . ' ' . $field),
+            'right' => '',
+        );
+
         $piping = RCView::img(array('src' => APP_PATH_IMAGES . 'pipe_small.gif')) . ' ';
         $piping .= RCView::a(array('href' => '#'), $lang['design_456']);
         $piping = RCView::div(array('class' => 'piping-helper'), $piping);
 
-        $output = '';
+        $default_classes = 'x-form-field chart-property-input chart-config-input';
+
         foreach ($this->jsSettings['configFields'] as $name => $info) {
             switch ($info['type']) {
                 case 'select':
                     $field = RCView::select(array(
                         'name' => $name,
-                        'class' => 'x-form-text x-form-field chart-property-input',
+                        'class' => $default_classes . ' x-form-text',
                     ), array('' => '--- Select ---') + $info['choices']);
                     break;
 
@@ -265,28 +278,35 @@ class ExternalModule extends AbstractExternalModule {
                 case 'array':
                     $field = RCView::textarea(array(
                         'name' => $name,
-                        'class' => 'x-form-textarea x-form-field chart-property-input',
+                        'class' => $default_classes . ' x-form-textarea',
                     ));
                     break;
 
                 case 'int':
                     $field = RCView::text(array(
                         'name' => $name,
-                        'class' => 'x-form-text x-form-field chart-property-input',
+                        'class' => $default_classes . ' x-form-text',
                     ));
                     break;
             }
 
             if (!empty($info['helper'])) {
-                $field .= RCView::div(array('class' => 'chart-property-helper'), $info['helper']);
+                $field .= RCView::div(array('class' => 'chart-config-helper'), $info['helper']);
             }
 
-            $label = RCView::div(array('class' => 'chart-property-label'), RCView::b($info['label']));
+            $label = RCView::div(array('class' => 'chart-config-label'), RCView::b($info['label']));
             if (!empty($info['piping'])) {
                 $label .= $piping;
             }
 
-            $output .= RCView::div(array('class' => 'chart-property'), RCView::div(array('class' => 'clearfix'), $label) . $field);
+            $field = RCView::div(array('class' => 'chart-config chart-property'), RCView::div(array('class' => 'clearfix'), $label) . $field);
+            $position = empty($info['is_additional_config']) ? 'left' : 'right';
+
+            $output[$position] .= $field;
+        }
+
+        foreach ($output as $position => $column) {
+            $output[$position] = RCView::div(array('class' => 'chart-container chart-container-' . $position), $column);
         }
 
         $this->jsSettings['onlineDesignerContents'] = $output;

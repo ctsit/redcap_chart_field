@@ -1,4 +1,37 @@
 /**
+ * Runs branching logic for chart config fields.
+ */
+redcapChartField.doBranching = function() {
+    var fieldType = $('select[name="field_type"]').val();
+    var toShow = '';
+    var toHide = '';
+
+    if (fieldType != 'descriptive') {
+        toHide = '.chart-container';
+
+        if (fieldType !== 'section_header') {
+            toShow = '#div_field_annotation';
+        }
+    }
+    else {
+       if ($('input[name="is_chart"]').is(':checked')) {
+           toShow = '.chart-container, .chart-property';
+           toHide = '#div_field_annotation, #div_attachment';
+        }
+        else {
+            toShow = '.chart-container-left, #div_field_annotation, #div_attachment';
+            toHide = '.chart-container-right, .chart-property';
+        }
+    }
+
+    if (toShow) {
+        $(toShow).show();
+    }
+
+    $(toHide).hide();
+};
+
+/**
  * Decodes a JSON string with more flexible constraints.
  */
 redcapChartField.looseJsonParse = function(ob) {
@@ -11,10 +44,12 @@ redcapChartField.looseJsonParse = function(ob) {
 redcapChartField.getChartParams = function(settings) {
     var params = {};
     $.each(settings, function(key, value) {
-        var type = redcapChartField.configFields[key].type;
+        if (value) {
+            var type = redcapChartField.configFields[key].type;
 
-        if (type === 'json' || type === 'array') {
-            value = redcapChartField.looseJsonParse(value);
+            if (type === 'json' || type === 'array') {
+                value = redcapChartField.looseJsonParse(value);
+            }
         }
 
         params[key.substr(6)] = value;

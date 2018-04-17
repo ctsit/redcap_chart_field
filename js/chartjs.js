@@ -12,7 +12,7 @@ $(document).ready(function() {
             ctx.canvas.height = params.height;
         }
 
-        $('#' + fieldName + '-tr').append($chart);
+        $('#' + fieldName + '-tr').html($chart);
         $chart.wrap('<td colspan="2"></td>');
 
         var chart = new Chart(ctx, params);
