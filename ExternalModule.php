@@ -52,7 +52,7 @@ class ExternalModule extends AbstractExternalModule {
             }
 
             // Using misc field to store chart metadata.
-            $_POST['field_annotation'] = json_encode($misc);
+            $_POST['field_annotation'] = json_encode($misc, JSON_HEX_QUOT);
         }
     }
 
