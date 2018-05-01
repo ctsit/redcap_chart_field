@@ -75,13 +75,13 @@ class ExternalModule extends AbstractExternalModule {
      * @inheritdoc
      */
     function redcap_survey_page_top($project_id, $record = null, $instrument, $event_id, $group_id = null, $survey_hash, $response_id = null, $repeat_instance = 1) {
-        $this->loadCharts($instrument, $record, $event_id, $repeat_instance);
+        $this->loadCharts($instrument, $record, $event_id, $repeat_instance, true);
     }
 
     /**
      * Load charts for the current page.
      */
-    function loadCharts($instrument, $record = null, $event_id, $instance) {
+    function loadCharts($instrument, $record = null, $event_id, $instance, $is_survey = false) {
         if (empty($this->lib)) {
             return;
         }
@@ -120,6 +120,7 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
+        $this->jsSettings['colspan'] = $is_survey ? 3 : 2;
         $this->loadChartsLib();
         $this->loadPageResources();
     }
@@ -131,6 +132,7 @@ class ExternalModule extends AbstractExternalModule {
         switch ($this->lib) {
             case 'chartjs':
                 $this->includeJs('//cdnjs.cloudflare.com/ajax/libs/Chart.js/' . CHARTJS_VERSION . '/Chart.min.js');
+                $this->cssFiles[] = 'css/' . $this->lib . '.css';
                 break;
 
             case 'chartist':
