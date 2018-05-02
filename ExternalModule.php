@@ -19,6 +19,7 @@ define('CHARTIST_VERSION', '0.11.0');
  */
 class ExternalModule extends AbstractExternalModule {
 
+    protected $lib;
     protected $cssFiles;
     protected $jsFiles = array('js/functions.js');
     protected $jsSettings = array(
@@ -29,19 +30,17 @@ class ExternalModule extends AbstractExternalModule {
      * @inheritdoc
      */
     function redcap_every_page_before_render($project_id) {
-        if (!$project_id) {
+        if (!$this->setConfigFieldsInfo($project_id)) {
             return;
         }
 
         global $Proj;
         foreach ($Proj->metadata as $field => $info) {
-            if ($info['element_type'] == 'descriptive' && ($settings = json_decode($Proj->metadata[$field]['misc'], true)) && isset($settings['chart_type'])) {
+            if ($info['element_type'] == 'descriptive' && ($settings = json_decode($info['misc'], true)) && isset($settings['chart_type'])) {
                 // Transfering chart metadata from misc field to JS settings array.
                 $this->jsSettings['fields'][$field] = $settings;
             }
         }
-
-        $this->jsSettings['configFields'] = $this->getConfigFieldsInfo($project_id);
 
         if (PAGE == 'Design/edit_field.php' && isset($_POST['field_type']) && $_POST['field_type'] == 'descriptive' && !empty($_POST['is_chart'])) {
             $misc = array();
@@ -60,7 +59,7 @@ class ExternalModule extends AbstractExternalModule {
      * @inheritdoc
      */
     function redcap_every_page_top($project_id) {
-        if (PAGE == 'Design/online_designer.php') {
+        if (PAGE == 'Design/online_designer.php' && !empty($this->lib)) {
             $this->buildConfigFormFields();
         }
     }
@@ -68,25 +67,37 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * @inheritdoc
      */
-    function redcap_data_entry_form_top($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
-        global $double_data_entry, $user_rights;
-        $entry_num = $double_data_entry && $user_rights['double_data'] ? '--' . $user_rights['double_data'] : '';
-
-        $this->loadCharts($instrument, $record . $entry_num, $event_id, $repeat_instance);
+    function redcap_data_entry_form_top($project_id, $record = null, $instrument, $event_id, $group_id = null, $repeat_instance = 1) {
+        $this->loadCharts($instrument, $record, $event_id, $repeat_instance);
     }
 
     /**
      * @inheritdoc
      */
-    function redcap_survey_page_top($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $survey_hash, $response_id = NULL, $repeat_instance = 1) {
-        $this->loadCharts($instrument, $record, $event_id, $repeat_instance);
+    function redcap_survey_page_top($project_id, $record = null, $instrument, $event_id, $group_id = null, $survey_hash, $response_id = null, $repeat_instance = 1) {
+        $this->loadCharts($instrument, $record, $event_id, $repeat_instance, true);
     }
 
     /**
      * Load charts for the current page.
      */
-    function loadCharts($instrument, $record, $event_id, $instance) {
+    function loadCharts($instrument, $record = null, $event_id, $instance, $is_survey = false) {
+        if (empty($this->lib)) {
+            return;
+        }
+
         global $Proj;
+
+        if (!$record) {
+            $record = $_GET['id'];
+        }
+
+        if ($Proj->project['double_data_entry']) {
+            global $user_rights;
+            if (!empty($user_rights['double_data'])) {
+                $record .= '--' . $user_rights['double_data'];
+            }
+        }
 
         // Getting the list of charts for the current form.
         $filtered = array();
@@ -96,7 +107,7 @@ class ExternalModule extends AbstractExternalModule {
             }
 
             foreach ($this->jsSettings['configFields'] as $key => $info) {
-                if (!empty($info['piping'])) {
+                if (!empty($info['piping']) && !empty($config[$key])) {
                     // Applying Piping on chart data.
                     $config[$key] = $this->__piping($config[$key], $record, $event_id, $instance);
                 }
@@ -109,6 +120,7 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
+        $this->jsSettings['colspan'] = $is_survey ? 3 : 2;
         $this->loadChartsLib();
         $this->loadPageResources();
     }
@@ -117,11 +129,10 @@ class ExternalModule extends AbstractExternalModule {
      * Load charts library on the current page.
      */
     function loadChartsLib() {
-        $lib = $this->getProjectSetting('chart_lib', $project_id);
-
-        switch ($lib) {
+        switch ($this->lib) {
             case 'chartjs':
                 $this->includeJs('//cdnjs.cloudflare.com/ajax/libs/Chart.js/' . CHARTJS_VERSION . '/Chart.min.js');
+                $this->cssFiles[] = 'css/' . $this->lib . '.css';
                 break;
 
             case 'chartist':
@@ -130,16 +141,18 @@ class ExternalModule extends AbstractExternalModule {
                 break;
         }
 
-        $this->jsFiles[] = 'js/' . $lib . '.js';
+        $this->jsFiles[] = 'js/' . $this->lib . '.js';
     }
 
     /**
-     * Get configuration fields according to the chosen library.
+     * Set configuration fields according to the chosen library.
      */
-    function getConfigFieldsInfo($project_id) {
-        $lib = $this->getProjectSetting('chart_lib', $project_id);
+    function setConfigFieldsInfo($project_id) {
+        if (!$project_id || !($lib = $this->getProjectSetting('chart_lib', $project_id)) || !($lib_link = $this->getChartLibraryLink($lib))) {
+            return false;
+        }
+
         $mod_link = $this->getModuleLink();
-        $lib_link = $this->getChartLibraryLink($lib);
 
         $helper = 'JS objects only. Check out ' . $mod_link . ' documentation to know how to fill out chart configuration fields.';
         $helper .= ' Check also ' . $lib_link . ' oficial website for documentation and examples.';
@@ -208,7 +221,10 @@ class ExternalModule extends AbstractExternalModule {
                 break;
         }
 
-        return $config;
+        $this->lib = $lib;
+        $this->jsSettings['configFields'] = $config;
+
+        return true;
     }
 
     /**
@@ -222,22 +238,20 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * Gets a labeled link to the given library's official website.
      */
-    function getChartLibraryLink($lib = null, $project_id = null) {
-        if (!$lib) {
-            $lib = $this->getProjectSetting('chart_lib', $project_id);
-        }
-
+    function getChartLibraryLink($lib) {
         $config = $this->getConfig();
         foreach ($config['project-settings'] as $setting) {
-            if ($setting['key'] == 'chart_lib') {
-                break;
+            if ($setting['key'] != 'chart_lib') {
+                continue;
             }
-        }
 
-        foreach ($setting['choices'] as $option) {
-            if ($option['value'] == $lib) {
-                return $option['name'];
+            foreach ($setting['choices'] as $option) {
+                if ($option['value'] == $lib) {
+                    return $option['name'];
+                }
             }
+
+            break;
         }
 
         return false;
