@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
 
         $('#' + fieldName + '-tr').html($chart);
-        $chart.wrap('<td colspan="2"></td>');
+        $chart.wrap('<td colspan="' + redcapChartField.colspan + '"></td>');
 
         var chart = new Chart(ctx, params);
     });
