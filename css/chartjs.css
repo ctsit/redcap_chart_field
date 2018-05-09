@@ -1,3 +1,7 @@
-#questiontable {
+.chartjs-wrapper {
     table-layout: fixed;
+}
+
+.chartjs-wrapper-full-width {
+    width: 100%
 }
