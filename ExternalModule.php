@@ -59,7 +59,7 @@ class ExternalModule extends AbstractExternalModule {
      * @inheritdoc
      */
     function redcap_every_page_top($project_id) {
-        if (PAGE == 'Design/online_designer.php' && !empty($this->lib)) {
+        if (PAGE == 'Design/online_designer.php' && !empty($this->lib) && !empty($_GET['page'])) {
             $this->buildConfigFormFields();
         }
     }
@@ -273,10 +273,6 @@ class ExternalModule extends AbstractExternalModule {
             'right' => '',
         );
 
-        $piping = RCView::img(array('src' => APP_PATH_IMAGES . 'pipe_small.gif')) . ' ';
-        $piping .= RCView::a(array('href' => '#'), $lang['design_456']);
-        $piping = RCView::div(array('class' => 'piping-helper'), $piping);
-
         $default_classes = 'x-form-field chart-property-input chart-config-input';
 
         foreach ($this->jsSettings['configFields'] as $name => $info) {
@@ -309,10 +305,6 @@ class ExternalModule extends AbstractExternalModule {
             }
 
             $label = RCView::div(array('class' => 'chart-config-label'), RCView::b($info['label']));
-            if (!empty($info['piping'])) {
-                $label .= $piping;
-            }
-
             $field = RCView::div(array('class' => 'chart-config chart-property'), RCView::div(array('class' => 'clearfix'), $label) . $field);
             $position = empty($info['is_additional_config']) ? 'left' : 'right';
 
@@ -386,11 +378,13 @@ class ExternalModule extends AbstractExternalModule {
      * Auxiliar function to prevent piping errors on nested brackets.
      */
     protected function __piping($str, $record, $event_id, $instance) {
-        $tmp = ' [!!!TEMP!!!]';
+        if (preg_match_all('/(["\'])(.*\].*)?\1/', $str, $matches)) {
+            foreach ($matches[2] as $result) {
+                $piped = Piping::replaceVariablesInLabel($result, $record, $event_id, $instance, array(), true, null, false);
+                $str = str_replace($result, $piped, $str);
+            }
+        }
 
-        $str = preg_replace('/(\[[^\[^\]]*\])+/', '$0' . $tmp, $str);
-        $str = Piping::replaceVariablesInLabel($str, $record, $event_id, $instance, array(), true, null, false);
-
-        return str_replace($tmp, '', $str);
+        return $str;
     }
 }

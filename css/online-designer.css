@@ -46,14 +46,3 @@
 .chart-config-helper a b {
     font-size: 10px;
 }
-
-.piping-helper {
-    float: right;
-    padding: 0 6px 1px 0;
-}
-
-.piping-helper a {
-    font-size: 11px;
-    color: #3e72a8;
-    text-decoration: underline;
-}

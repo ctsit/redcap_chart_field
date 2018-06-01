@@ -47,12 +47,6 @@ $(document).ready(function() {
         // Branching logic on chart fields.
         redcapChartField.doBranching();
 
-        $('.piping-helper a').click(function() {
-            // Opening piping helper modal.
-            pipingExplanation();
-            return false;
-        });
-
         // Adding validation on submit.
         var buttons = $(this).dialog('option', 'buttons');
         $.each(buttons, function(i, button) {
