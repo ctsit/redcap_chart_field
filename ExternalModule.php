@@ -109,7 +109,7 @@ class ExternalModule extends AbstractExternalModule {
             foreach ($this->jsSettings['configFields'] as $key => $info) {
                 if (!empty($info['piping']) && !empty($config[$key])) {
                     // Applying Piping on chart data.
-                    $config[$key] = $this->__piping($config[$key], $record, $event_id, $instance);
+                    $config[$key] = $this->__piping($config[$key], $record, $event_id, $instrument, $instance);
                 }
             }
 
@@ -377,10 +377,10 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * Auxiliar function to prevent piping errors on nested brackets.
      */
-    protected function __piping($str, $record, $event_id, $instance) {
+    protected function __piping($str, $record, $event_id, $instrument, $instance) {
         if (preg_match_all('/(["\'])(.*\].*)?\1/', $str, $matches)) {
             foreach ($matches[2] as $result) {
-                $piped = Piping::replaceVariablesInLabel($result, $record, $event_id, $instance, array(), true, null, false);
+                $piped = Piping::replaceVariablesInLabel($result, $record, $event_id, $instance, array(), true, null, false, '', 1, false, false, $instrument);
                 $str = str_replace($result, $piped, $str);
             }
         }
