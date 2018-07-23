@@ -1,5 +1,5 @@
 # REDCap Chart Field
-Provides a chart drawing feature for data entries and surveys. Integrates REDCap with third-party chart libraries - currently [Charts.js](http://www.chartjs.org/) and [Chartist](https://gionkunz.github.io/chartist-js/) are supported. [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php) can be used on field configuration, so charts may display facts to survey participants based on their previous answers.
+Provides a chart drawing feature for data entries and surveys. Integrates REDCap with third-party chart libraries - currently [Charts.js](http://www.chartjs.org/) and [Chartist](https://gionkunz.github.io/chartist-js/) are supported. [Piping](https://redcap.vanderbilt.edu/redcap_v5.5.0/DataEntry/piping_explanation.php) can be used on field configuration, so charts may display facts to survey participants based on their previous answers.
 
 ## Prerequisites
 - REDCap >= 8.0.3
@@ -14,7 +14,7 @@ Two amazing third-party chart libraries are supported by this module - Chart.js 
 ![Configuration screen](img/config_screen.png)
 
 ## Setting up a chart field (Chart.js example)
-This section will walk you through a few steps to setup a [Charts.js](http://www.chartjs.org/) chart, dynamically populated via [Piping](https://redcap.vanderbilt.edu/redcap_v8.3.2/DataEntry/piping_explanation.php).
+This section will walk you through a few steps to setup a [Charts.js](http://www.chartjs.org/) chart, dynamically populated via [Piping](https://redcap.vanderbilt.edu/redcap_v5.5.0/DataEntry/piping_explanation.php).
 
 ### 1. Setting up source data (for Piping purposes)
 
