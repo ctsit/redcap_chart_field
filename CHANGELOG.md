@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the REDCap Chart Field project will be documented in this file.
 
+## [1.1.0] - 2018-07-23
+### Changed
+- Fixed smart variables on charts. (Tiago Bember Simeao)
+
 
 ## [1.0.2] - 2018-05-09
 ### Changed
