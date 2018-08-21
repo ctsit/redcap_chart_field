@@ -29,8 +29,8 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * @inheritdoc
      */
-    function redcap_every_page_before_render($project_id) {
-        if (!$this->setConfigFieldsInfo($project_id)) {
+    function redcap_every_page_before_render($project_id = null) {
+        if (!$project_id || !$this->setConfigFieldsInfo($project_id)) {
             return;
         }
 
@@ -58,7 +58,7 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * @inheritdoc
      */
-    function redcap_every_page_top($project_id) {
+    function redcap_every_page_top($project_id = null) {
         if (PAGE == 'Design/online_designer.php' && !empty($this->lib) && !empty($_GET['page'])) {
             $this->buildConfigFormFields();
         }
