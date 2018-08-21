@@ -6,6 +6,12 @@ All notable changes to the REDCap Chart Field project will be documented in this
 - Fixing incompatibility with old REDCap versions. (Tiago Bember Simeao)
 
 
+## [1.1.0] - 2018-07-23
+### Changed
+- Modify method calls to fix smart-variables functionality (Dileep)
+- Fixing Piping for Smart Variables + small fixes. (Tiago Bember Simeao)
+
+
 ## [1.0.2] - 2018-05-09
 ### Changed
 - Fixing regression on surveys table display. (Tiago Bember Simeao)
