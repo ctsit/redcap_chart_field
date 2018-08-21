@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the REDCap Chart Field project will be documented in this file.
 
+## [1.1.1] - 2018-08-21
+### Changed
+- Fixing incompatibility with old REDCap versions. (Tiago Bember Simeao)
+
 
 ## [1.0.2] - 2018-05-09
 ### Changed
