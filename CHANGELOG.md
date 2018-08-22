@@ -8,8 +8,7 @@ All notable changes to the REDCap Chart Field project will be documented in this
 
 ## [1.1.0] - 2018-07-23
 ### Changed
-- Modify method calls to fix smart-variables functionality (Dileep)
-- Fixing Piping for Smart Variables + small fixes. (Tiago Bember Simeao)
+- Fixed smart variables on charts. (Tiago Bember Simeao)
 
 
 ## [1.0.2] - 2018-05-09
