@@ -10,11 +10,6 @@
     ],
     "authors": [
         {
-            "name": "Tiago Bember",
-            "email": "tbembersimeao@ufl.edu",
-            "institution": "University of Florida - CTSI"
-        },
-        {
             "name": "Philip Chase",
             "email": "pbc@ufl.edu",
             "institution": "University of Florida - CTSI"
@@ -25,8 +20,8 @@
             "institution": "University of Florida - CTSI"
         },
         {
-            "name": "Marly Cormar",
-            "email": "marlycormar@ufl.edu",
+            "name": "Kyle Chesney",
+            "email": "kyle.chesney@ufl.edu",
             "institution": "University of Florida - CTSI"
         }
     ],
